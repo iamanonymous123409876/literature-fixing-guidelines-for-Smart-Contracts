@@ -433,6 +433,46 @@ address dest - Oxeeeeeeeeeeeeeeeeeeee;
 
 
 
+### Smart Contract Code Repair Recommendation based on Reinforcement Learning  [5]
+
+When the value exceeds this range, an overflow will occur. Therefore, after operations such as `+`, `-`, `*`, and `/`, this vulnerability arises when the variable is not validated in time for its value. This is an **arithmetic**
+
+
+
+by executing Approval method in line 14, a user A (i.e., msg.sender) allows a user B (i.e.,spender) to transfer N tokens by calling approval function. If A wants to change the allowed transfer amount from N to M, but B has already sent a transaction to transfer N and executed it first, then B can transfer N tokens before A modifies the transfer amount, resulting in A’s additional loss. One of the fix suggestions is to add a field to the inputs of approve, which is the expected current value and to have approved revert if B’s current allowance is not what A indicated she was expecting [65]. For example, a statement require(_allowed [msg.sender][spender]==0||value==0); can be added before line 13.
+
+
+
+```solidity
+contract TransactionOrderDependence {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowed;
+    uint256 private _totalSupply;
+
+    constructor(uint totalSupply) {
+        _balances[msg.sender] = totalSupply;
+    }
+
+    function approve(address spender, uint256 value) public returns (bool) {
+        require(spender != address(0));
++        require(_allowed[msg.sender][spender] == 0 || value == 0);
+        _allowed[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+        return true;
+    }
+}
+
+```
+
+
+
+****
+
+
+
 ### References
 
 [1] Chen, J., Xia, X., Lo, D., Grundy, J., Luo, X., & Chen, T. (2020). Defining smart contract defects on ethereum. *IEEE Transactions on Software Engineering*, *48*(1), 327-345.
@@ -442,3 +482,6 @@ address dest - Oxeeeeeeeeeeeeeeeeeeee;
 [3] Zhou, X., Chen, Y., Guo, H., Chen, X., & Huang, Y. (2023, March). Security Code Recommendations for Smart Contract. In *2023 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER)* (pp. 190-200). IEEE.
 
 [4] Chen, Q., Zhou, T., Liu, K., Li, L., Ge, C., Liu, Z., ... & Bissyandé, T. F. (2023). Tips: towards automating patch suggestion for vulnerable smart contracts. *Automated Software Engineering*, *30*(2), 31.
+
+[5] Guo, H., Chen, Y., Chen, X., Huang, Y., & Zheng, Z. (2024). Smart contract code repair recommendation based on reinforcement learning and multi-metric optimization. *ACM Transactions on Software Engineering and Methodology*, *33*(4), 1-31.
+
